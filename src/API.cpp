@@ -8,10 +8,7 @@
 #include "API.hpp"
 #include <iostream>
 
-int main()
+void test(int* point)
 {
-    
-    std::cout<<" a \n";
-    
-    return 0;
+    std::cout<< *point <<std::endl;
 }

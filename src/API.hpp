@@ -8,6 +8,6 @@
 #ifndef API_hpp
 #define API_hpp
 
-#include <stdio.h>
+void test(int* point);
 
 #endif /* API_hpp */
