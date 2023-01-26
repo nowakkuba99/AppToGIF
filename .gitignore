@@ -30,6 +30,9 @@
 *.exe
 *.out
 *.app
+
+#Xcode Project
+*.xcodeproj
 # XCode project
 *.xcodeproj
 #########################
@@ -249,3 +252,9 @@ xcuserdata/
 ####
 # UNKNOWN: recommended by others, but I can't discover what these files are
 #
+AppToGIF.xcodeproj/
+*.json
+*.pbxproj
+*.xcworkspacedata
+*.plist
+*.xcuserstate
