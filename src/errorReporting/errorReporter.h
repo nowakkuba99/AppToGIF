@@ -29,7 +29,10 @@ enum class ErrorReporter
     CouldNotReceivePacket,
     CouldNotWriteFrame,
     CouldNotWriteTrailer,
-    CouldNotCloseFile
+    CouldNotCloseFile,
+    CouldNotGetFrame,
+    CouldNotCommitFrameSinceBufferIsEmpty,
+    CouldNotGenerateFrame
 };
 }
 #endif /* errorReporter_h */
