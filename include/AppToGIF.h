@@ -12,8 +12,8 @@
 #ifndef AppToGIF_h
 #define AppToGIF_h
 
-#include "src/API/API.hpp"
-#include "src/FrameBuffer/FrameBuffer.cpp"
+#include "src/EncoderApp/EncoderApp.hpp"
+#include "src/FrameBuffer/FrameBuffer.hpp"
 
 
 #endif /* AppToGIF_h */

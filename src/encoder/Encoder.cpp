@@ -436,7 +436,79 @@ ErrorReporter Encoder::commitFile()
     }
     
     return ErrorReporter::NoError;
-}
+}// commitFile()
+
+void Encoder::freeAllocatedData()
+{
+    /* -------------- Free packets allocated for images  --------------*/
+    if(& m_OutputStream.tmpFrame->data[0] != nullptr)
+        av_freep(& m_OutputStream.tmpFrame->data[0]);
+    if(& m_OutputStream.yuvFrame->data[0] != nullptr)
+        av_freep(& m_OutputStream.yuvFrame->data[0]);
+    if(& m_OutputStream.frame->data[0] != nullptr)
+        av_freep(& m_OutputStream.frame->data[0]);
+
+    /* -------------- Free allocated frames  --------------*/
+    if( m_OutputStream.frame != nullptr)
+    {
+        av_frame_free(& m_OutputStream.frame);
+        m_OutputStream.frame = nullptr;
+    }
+    if( m_OutputStream.tmpFrame != nullptr)
+    {
+        av_frame_free(& m_OutputStream.tmpFrame);
+        m_OutputStream.tmpFrame = nullptr;
+    }
+    if( m_OutputStream.yuvFrame != nullptr)
+    {
+        av_frame_free(& m_OutputStream.yuvFrame);
+        m_OutputStream.yuvFrame = nullptr;
+    }
+    
+    /* -------------- Free allocated packet  --------------*/
+    if( m_OutputStream.packet != nullptr)
+    {
+        av_packet_free(& m_OutputStream.packet);
+        m_OutputStream.packet = nullptr;
+    }
+    
+    /* -------------- Free allocated switchContextes  --------------*/
+    if(m_Settings.doubleEncoding)
+    {
+        if( m_OutputStream.swsCtx != nullptr)
+        {
+            sws_freeContext( m_OutputStream.swsCtx);
+            m_OutputStream.swsCtx = nullptr;
+        }
+        if( m_OutputStream.swsGIFCtx != nullptr)
+        {
+            sws_freeContext( m_OutputStream.swsGIFCtx);
+            m_OutputStream.swsGIFCtx = nullptr;
+        }
+    }
+    else
+    {
+        if( m_OutputStream.swsFast != nullptr)
+        {
+            sws_freeContext( m_OutputStream.swsFast);
+            m_OutputStream.swsFast = nullptr;
+        }
+    }
+    
+    /* -------------- Free allocated codecContext  --------------*/
+    if( m_OutputStream.codecContext != nullptr)
+    {
+        avcodec_free_context(& m_OutputStream.codecContext);
+        m_OutputStream.codecContext = nullptr;
+    }
+    
+    /* -------------- Free alocated formatContext  --------------*/
+    if( m_OutputStream.formatContext != nullptr)
+    {
+        avformat_free_context( m_OutputStream.formatContext);
+        m_OutputStream.formatContext = nullptr;
+    }
+}// freeAllocatedData()
 
 
 

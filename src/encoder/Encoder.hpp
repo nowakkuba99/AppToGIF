@@ -62,7 +62,10 @@ public:
     {
         m_Settings.fileName = fName;
     }
-    ~Encoder() = default;
+    ~Encoder()
+    {
+        freeAllocatedData();    //Deallocate data if needed
+    };
     /* Functions */
     //Function used to initialize ffpmeg pipeline
     ErrorReporter init();
@@ -72,6 +75,8 @@ public:
     ErrorReporter addFrame();
     //Function used to close file and write tail
     ErrorReporter commitFile();
+    //Function used to free alocated objects
+    void freeAllocatedData();
     
     
     
