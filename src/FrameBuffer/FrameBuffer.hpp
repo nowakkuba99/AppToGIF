@@ -24,47 +24,29 @@ class FrameBuffer
 {
 public:
     /* --- Constructor and Destructor --- */
-    FrameBuffer() = default;
+    FrameBuffer(unsigned int size = 2)
+    {
+        if(size > m_MaxSize)
+        {
+            m_Size = m_MaxSize;
+            std::cout<<"Max size exceeded. Setting size to:"<<m_MaxSize<<"\n";
+        }
+        else
+            m_Size = size;
+    };
     
     /* --- Functions --- */
     //Get frame that can be filled with data
     //Returns frame if possible and nullptr if frameBuffer is full
-    std::shared_ptr<AppToGIF::Frame> getFrame()
-    {
-        if(m_Buffer.size() < m_Size && !m_APIHasFrame)
-        {
-            m_Buffer.push(std::make_shared<AppToGIF::Frame>());
-            m_APIHasFrame = true;
-            return m_Buffer.back();
-        }
-        return nullptr; //Buffer full or frame not passed to buffer!
-    }
+    std::shared_ptr<AppToGIF::Frame> getFrame();
+    
     //Get frame filled with data to frame buffer
     //The app can no longer have access to data in order to work
-    AppToGIF::ErrorReporter passFrame()
-    {
-        if(m_Buffer.back().unique() && m_APIHasFrame)
-        {
-            std::cout<<"Success!"<<std::endl;
-            std::cout<<m_Buffer.front()->m_width<<std::endl;
-            m_APIHasFrame = false;
-
-        }
-
-        return ErrorReporter::NoError;
-    }
+    AppToGIF::ErrorReporter passFrame();
+    
     //Commit frame from the top of the buffer
     //Sends frame to encoder to write to file
-    AppToGIF::ErrorReporter commitFrame()
-    {
-        //Pass data to encoder
-        std::cout<<"m_width na na poczatku: "<<m_Buffer.front()->m_width<<"\n";
-        m_Buffer.front().reset();
-        m_Buffer.pop();
-        
-        
-        return ErrorReporter::NoError;
-    }
+    AppToGIF::ErrorReporter commitFrame();
     
     void testCV()
     {
@@ -88,7 +70,7 @@ private:
     std::queue<std::shared_ptr<AppToGIF::Frame>> m_Buffer;
     
     /* --- Buffer size related variables --- */
-    unsigned int m_Size = 2;
+    unsigned int m_Size;
     const unsigned int m_MaxSize = 5;
     
     /* --- Frame owership variables --- */
