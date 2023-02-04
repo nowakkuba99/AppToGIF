@@ -12,6 +12,7 @@
 /* --- User incldues --- */
 #include "ffmpeg.h"
 #include "errorReporter.h"
+#include "Frame.hpp"
 
 
 namespace AppToGIF {
@@ -26,7 +27,7 @@ struct GIFSettings {
     int frameRate = 11;
     int bitRate = 10;
     bool doubleEncoding = false;
-    bool inputAlpha = false;
+    bool inputAlpha = true;
 };
 
 /* --- ffmpeg member variables --- */
@@ -69,14 +70,15 @@ public:
     /* Functions */
     //Function used to initialize ffpmeg pipeline
     ErrorReporter init();
-    //Function used to convert data from API to frame
-    ErrorReporter generateFrame(int sin_i,int i);
+    //Function used to convert data from frame object to AVframe
+    ErrorReporter generateFrame(AppToGIF::Frame* frame);
     //Function used to write current frame data to file
     ErrorReporter addFrame();
     //Function used to close file and write tail
     ErrorReporter commitFile();
     //Function used to free alocated objects
     void freeAllocatedData();
+
     
     
     

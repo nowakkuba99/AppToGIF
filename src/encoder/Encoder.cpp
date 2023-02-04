@@ -241,37 +241,22 @@ ErrorReporter Encoder::init()
 }//init()
 
 
-//Function used to convert data from API to frame
-ErrorReporter Encoder::generateFrame(int sin_i,int i)
+//Function used to convert data from Frame object to AVframe
+ErrorReporter Encoder::generateFrame(AppToGIF::Frame* srcFrame)
 {
-//    for (int y = 0; y < m_Settings.inputHeight; y++)
-//    {
-//        for (int x = 0; x < m_Settings.inputWidth * 4; x+=4) {
-//            m_OutputStream.tmpFrame->data[0][y * m_OutputStream.tmpFrame->linesize[0] + x+0] = 0;  //B
-//            m_OutputStream.tmpFrame->data[0][y * m_OutputStream.tmpFrame->linesize[0] + x+1] = 0xff;  //G
-//            m_OutputStream.tmpFrame->data[0][y * m_OutputStream.tmpFrame->linesize[0] + x+2] = 0;  //R
-//            m_OutputStream.tmpFrame->data[0][y * m_OutputStream.tmpFrame->linesize[0] + x+3] = 0xFF;    //A
-//        }
-//    }
-    for (int y = 0; y < m_Settings.inputHeight; y++)
+    const int pixelSize = m_Settings.inputAlpha
+            ? 4 * sizeof(uint8_t)
+            : 3 * sizeof(uint8_t);
+    if(srcFrame != nullptr)
     {
-        for (int x = 0; x < m_Settings.inputWidth * 4; x+=4) {
-            m_OutputStream.tmpFrame->data[0][y * m_OutputStream.tmpFrame->linesize[0] + x+0] = (x + i)&0xFF;
-            m_OutputStream.tmpFrame->data[0][y * m_OutputStream.tmpFrame->linesize[0] + x+1] = (y + i)&0xff;
-            m_OutputStream.tmpFrame->data[0][y * m_OutputStream.tmpFrame->linesize[0] + x+2] = sin_i&0xFF;  //R
-            m_OutputStream.tmpFrame->data[0][y * m_OutputStream.tmpFrame->linesize[0] + x+3] = 0xFF;    //A
-        }
+        memcpy(
+               m_OutputStream.tmpFrame->data[0],
+               srcFrame->m_rgb,
+               (size_t)srcFrame->m_width * srcFrame->m_height * pixelSize);
+        return ErrorReporter::NoError;
     }
-    
-//    for (int y = 0; y <1080; ++y) {
-//        uint8_t *row = &frame->m_rgb[y * lineWidth];
-//        for (int x = 0; x < 1920; ++x) {
-//            const int index = x * 3;
-//            row[index + 0] = (x + i) & 0xFF; // r
-//            row[index + 1] = (y + i) & 0xFF; // g
-//            row[index + 2] = sin_i & 0xFF;   // b
-//        }
-    return ErrorReporter::NoError;
+    return ErrorReporter::CouldNotGenerateFrame;
+
 }//generateFrame
 
 
