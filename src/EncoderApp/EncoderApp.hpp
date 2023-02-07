@@ -15,6 +15,7 @@
 /* --- User includes --- */
 #include "Frame.hpp"
 #include "FrameBuffer.hpp"
+#include "Encoder.hpp"
 
 #ifndef EncoderApp_hpp
 #define EncoderApp_hpp
@@ -23,38 +24,57 @@ namespace AppToGIF
 class EncoderApp
 {
 public:
-    void start(FrameBuffer* bufferPointer)
-    {
-        m_Buffer = bufferPointer;
-        m_TestThread = std::make_unique<std::thread>(&AppToGIF::EncoderApp::test,this);
-    }
+    /* --- Copy constructor and assign operator deletion --- */
+    EncoderApp(const EncoderApp&) = delete;
+    void operator=(const EncoderApp&) = delete;
     
-    void test()
-    {
-        std::cout<<"Start thread 2\n";
-        std::unique_lock<std::mutex> lock(m_Mutex);
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        
-        m_Buffer->passFrame();
-        lock.unlock();
-        m_Buffer->testCVNotify();
-        //m_ConditionVariable.notify_all();
-        std::cout<<"Notify poszedl!\n";
-    }
+    /* --- Functions to be called by user --- */
+    //Initialize FrameBuffer and set video settings
+    void init(std::string fileName = "AppToGIF.gif");
     
-    void stop()
-    {
-        m_TestThread->join();
-        m_TestThread.reset();
-    }
+    //Start the encoderApp - start second thread
+    void startEncoder();
+    //Stop the encoderApp when file is ready
+    void stopEncoder();
     
+    /* --- Private functions --- */
+    //Function executed by worker thread
+    void worker();
+    
+protected:
+    /* --- Constructor and destructor --- */
+    EncoderApp() = default;
+    ~EncoderApp()
+    {
+        if(p_WorkerThread != nullptr)
+        {
+            p_WorkerThread->join();
+            p_WorkerThread.reset();
+        }
+        if(p_Encoder != nullptr)
+        {
+            p_Encoder->freeAllocatedData();
+            p_Encoder.reset();
+        }
+    }
+public:
+    /* --- Singelton class instance getter --- */
+    static EncoderApp& getInstance()
+    {
+        static EncoderApp instance;
+        return instance;
+    }
+
 private:
+    
     /* --- Frame ownership variables --- */
     std::mutex m_Mutex;
-//    std::condition_variable m_ConditionVariable;
-    std::unique_ptr<std::thread> m_TestThread;
-    
-    FrameBuffer* m_Buffer;
+    /* --- Thread responsible for encoding --- */
+    std::unique_ptr<std::thread> p_WorkerThread;
+    /* --- Frame bufffer --- */
+    std::unique_ptr<FrameBuffer> p_FrameBuffer;
+    /* --- Encoder object --- */
+    std::unique_ptr<Encoder> p_Encoder;
     
 };
 }

@@ -21,8 +21,10 @@ public:
     int m_maxWidth, m_maxHeight;
     int m_lineWidth;
     
+    inline void setReady() { m_ReadyToEncode = true; }
+    inline bool ready() const { return m_ReadyToEncode; }
 private:
-    
+    bool m_ReadyToEncode = false;
 };
 }
 

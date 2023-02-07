@@ -48,6 +48,10 @@ public:
     //Sends frame to encoder to write to file
     AppToGIF::ErrorReporter commitFrame();
     
+    //Function to wait for frame to be ready for encoding
+    //Returns frame filled with data from user
+    std::shared_ptr<AppToGIF::Frame> waitForFrame();
+    
     void testCV()
     {
         std::unique_lock<std::mutex> lock(m_Mutex);

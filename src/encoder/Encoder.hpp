@@ -72,6 +72,8 @@ public:
     ErrorReporter init();
     //Function used to convert data from frame object to AVframe
     ErrorReporter generateFrame(AppToGIF::Frame* frame);
+    //Function used to convert data from frame object to AVframe
+    ErrorReporter generateFrame(std::shared_ptr<AppToGIF::Frame> frame);
     //Function used to write current frame data to file
     ErrorReporter addFrame();
     //Function used to close file and write tail

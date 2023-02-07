@@ -259,6 +259,23 @@ ErrorReporter Encoder::generateFrame(AppToGIF::Frame* srcFrame)
 
 }//generateFrame
 
+//Function used to convert data from frame object to AVframe
+ErrorReporter Encoder::generateFrame(std::shared_ptr<AppToGIF::Frame> srcFrame)
+{
+    const int pixelSize = m_Settings.inputAlpha
+            ? 4 * sizeof(uint8_t)
+            : 3 * sizeof(uint8_t);
+    if(srcFrame != nullptr)
+    {
+        memcpy(
+               m_OutputStream.tmpFrame->data[0],
+               srcFrame->m_rgb,
+               (size_t)srcFrame->m_width * srcFrame->m_height * pixelSize);
+        return ErrorReporter::NoError;
+    }
+    return ErrorReporter::CouldNotGenerateFrame;
+}
+
 
 //Function used to write current frame data to file
 ErrorReporter Encoder::addFrame()

@@ -41,14 +41,34 @@ AppToGIF::ErrorReporter FrameBuffer::passFrame()
 //Sends frame to encoder to write to file
 AppToGIF::ErrorReporter FrameBuffer::commitFrame()
 {
-    if(m_Buffer.size()>0)        //Pass data to encoder
+    if(m_Buffer.size()>0 && !m_Buffer.front()->ready())     //If some frame has not been passed to encoder
     {
-        std::cout<<"m_width na na poczatku: "<<m_Buffer.front()->m_width<<"\n";
-        m_Buffer.front().reset();
-        m_Buffer.pop();
+        m_Buffer.front()->setReady();
+        m_ConditionVariable.notify_one();
         return ErrorReporter::NoError;
     }
     return ErrorReporter::CouldNotCommitFrameSinceBufferIsEmpty;
 }
 
+
+//Function to wait for frame to be ready for encoding
+//Returns frame filled with data from user
+std::shared_ptr<AppToGIF::Frame> FrameBuffer::waitForFrame()
+{
+    //Lock frame access
+    std::unique_lock<std::mutex> lock(m_Mutex);
+    //Prepare return value
+    std::shared_ptr<AppToGIF::Frame> retValue;
+    retValue = m_Buffer.front();
+    //Check condition
+    m_ConditionVariable.wait(lock,[this]()
+                                        {
+                                            return m_Buffer.front()->ready();
+                                        });
+    //Delete pointer and delete Frame object from queue
+    m_Buffer.front().reset();
+    m_Buffer.pop();
+    //Return pointer to ready frame
+    return retValue;
+}
 }
