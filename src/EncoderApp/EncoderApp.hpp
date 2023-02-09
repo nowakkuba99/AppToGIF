@@ -16,6 +16,7 @@
 #include "Frame.hpp"
 #include "FrameBuffer.hpp"
 #include "Encoder.hpp"
+#include "errorReporter.h"
 
 #ifndef EncoderApp_hpp
 #define EncoderApp_hpp
@@ -30,13 +31,14 @@ public:
     
     /* --- Functions to be called by user --- */
     //Initialize FrameBuffer and set video settings
-    void init(std::string fileName = "AppToGIF.gif");
-    
+    void init(AppToGIF::GIFSettings settings);
     //Start the encoderApp - start second thread
     void startEncoder();
     //Stop the encoderApp when file is ready
     void stopEncoder();
-    
+    //Destroy encoder thread
+    void destroyEncoder();
+private:
     /* --- Private functions --- */
     //Function executed by worker thread
     void worker();
@@ -75,6 +77,10 @@ private:
     std::unique_ptr<FrameBuffer> p_FrameBuffer;
     /* --- Encoder object --- */
     std::unique_ptr<Encoder> p_Encoder;
+    /* --- App run variable --- */
+    bool m_running = false;
+    /* --- Error reporting variable --- */
+    AppToGIF::ErrorReporter m_error = AppToGIF::ErrorReporter::NoError;
     
 };
 }

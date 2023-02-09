@@ -63,6 +63,7 @@ public:
     {
         m_Settings.fileName = fName;
     }
+    Encoder(AppToGIF::GIFSettings settings) : m_Settings(settings) {}
     ~Encoder()
     {
         freeAllocatedData();    //Deallocate data if needed
