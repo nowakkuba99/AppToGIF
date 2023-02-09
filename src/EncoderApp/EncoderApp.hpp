@@ -30,6 +30,7 @@ public:
     void operator=(const EncoderApp&) = delete;
     
     /* --- Functions to be called by user --- */
+    
     //Initialize FrameBuffer and set video settings
     void init(AppToGIF::GIFSettings settings);
     //Start the encoderApp - start second thread
@@ -38,6 +39,27 @@ public:
     void stopEncoder();
     //Destroy encoder thread
     void destroyEncoder();
+    
+    /* --- Frames related functions --- */
+    //Get frame that can be filled with data
+    //Returns frame if possible and nullptr if frameBuffer is full
+    inline std::shared_ptr<AppToGIF::Frame> getFrame()
+    {
+        return p_FrameBuffer->getFrame();
+    }
+    //Get frame filled with data to frame buffer
+    //The app can no longer have access to data in order to work
+    inline AppToGIF::ErrorReporter passFrame()
+    {
+        return p_FrameBuffer->passFrame();
+    }
+    //Commit frame from the top of the buffer
+    //Sends frame to encoder to write to file
+    inline AppToGIF::ErrorReporter commitFrame()
+    {
+        return p_FrameBuffer->commitFrame();
+    }
+    
 private:
     /* --- Private functions --- */
     //Function executed by worker thread

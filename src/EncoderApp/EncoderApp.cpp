@@ -35,11 +35,11 @@ void EncoderApp::startEncoder()
 void EncoderApp::stopEncoder()
 {
     m_running = false;
+    p_FrameBuffer->m_AppEnd = true;
 }
 //Destroy encoder thread
 void EncoderApp::destroyEncoder()
 {
-    std::unique_lock<std::mutex> lock(m_Mutex);
     if(p_WorkerThread != nullptr)
     {
         p_WorkerThread->join();
@@ -61,6 +61,7 @@ void EncoderApp::worker()
         std::shared_ptr<Frame> frame = p_FrameBuffer->waitForFrame();
         if(frame != nullptr)
         {
+            std::cout<<"[WORKER] Ilość właścicieli frame?: "<<frame.use_count()<<"\n";
             err = p_Encoder->generateFrame(frame);
             if(err != AppToGIF::ErrorReporter::NoError) goto end;
             err = p_Encoder->addFrame();
@@ -80,7 +81,6 @@ end:
     std::lock_guard<std::mutex> lock(m_Mutex);
     m_error = err;
     m_running = false;
-    destroyEncoder();
-    
+    p_Encoder->freeAllocatedData();
 }
 }
