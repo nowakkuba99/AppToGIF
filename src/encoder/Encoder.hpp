@@ -25,7 +25,7 @@ struct GIFSettings {
     int outputWidth = 400;
     int outputHeight = 400;
     int frameRate = 11;
-    int bitRate = 10;
+    int bitRate = 1000;
     bool doubleEncoding = false;
     bool inputAlpha = true;
 };
