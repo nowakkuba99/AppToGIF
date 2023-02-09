@@ -52,23 +52,6 @@ public:
     //Returns frame filled with data from user
     std::shared_ptr<AppToGIF::Frame> waitForFrame();
     
-    void testCV()
-    {
-        std::unique_lock<std::mutex> lock(m_Mutex);
-        std::cout<<"Czekanie start\n";
-        m_ConditionVariable.wait(lock,[this]
-                                 {
-                                    std::cout<<"Czy API ma ramke?: "<<m_APIHasFrame<<"\n";
-                                    return m_APIHasFrame == false;});
-        
-        std::cout<<"Doczekalem sie!\n";
-        
-        lock.unlock();
-    }
-    void testCVNotify()
-    {
-        m_ConditionVariable.notify_one();
-    }
 private:
     /* --- Buffer queue --- */
     std::queue<std::shared_ptr<AppToGIF::Frame>> m_Buffer;
@@ -81,6 +64,8 @@ private:
     bool m_APIHasFrame = false;
     std::mutex m_Mutex;
     std::condition_variable m_ConditionVariable;
+public:
+    bool m_AppEnd = false;  //Setter to write
     
 };
 }
