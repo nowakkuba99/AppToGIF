@@ -15,6 +15,10 @@ namespace AppToGIF
 std::shared_ptr<AppToGIF::Frame> FrameBuffer::getFrame()
 {
     std::unique_lock<std::mutex> lock(m_Mutex);
+    m_ConditionVariable.wait(lock,[this]()
+                                    {
+                                    return m_Buffer.size() < m_Size;
+                                    });
     if(m_Buffer.size() < m_Size && !m_APIHasFrame)
     {
         m_Buffer.push(std::make_shared<AppToGIF::Frame>());
@@ -31,8 +35,6 @@ AppToGIF::ErrorReporter FrameBuffer::passFrame()
     std::unique_lock<std::mutex> lock(m_Mutex);
     if(m_Buffer.back().unique() && m_APIHasFrame)
     {
-        std::cout<<"Success!"<<std::endl;
-        std::cout<<m_Buffer.front()->m_width<<std::endl; //Debug
         m_APIHasFrame = false;
         return ErrorReporter::NoError;
     }
@@ -65,7 +67,7 @@ std::shared_ptr<AppToGIF::Frame> FrameBuffer::waitForFrame()
                                         {
                                             return (m_Buffer.size()>0 ? m_Buffer.front()->ready() : false)
                                                     ||
-                                                    (m_Buffer.size() == 0 && m_AppEnd);
+                                                    (m_AppEnd); //m_Buffer.size() == 0 &&
                                         });
     if(m_Buffer.size() == 0)
         return nullptr;
@@ -75,6 +77,7 @@ std::shared_ptr<AppToGIF::Frame> FrameBuffer::waitForFrame()
     //Delete pointer and delete Frame object from queue
     m_Buffer.front().reset();
     m_Buffer.pop();
+    m_ConditionVariable.notify_one();
     //Return pointer to ready frame
     return retValue;
 }
