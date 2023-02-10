@@ -61,7 +61,7 @@ ErrorReporter Encoder::init()
                 // I needed to multiply this by 3 because for some reason, the GIF was 3x slower than normal.
                 // GIF frame rates have a hard limit of 100FPS. If FRAME_RATE=30 i.e. 30FPS then this workaround actually encodes it at 90FPS
                 // If however the GIF moves too fast because of this then remove the *3 from the next line.
-                m_OutputStream.stream->time_base       = (AVRational){1, m_Settings.frameRate*3};
+                m_OutputStream.stream->time_base       = (AVRational){1, m_Settings.frameRate};
                 m_OutputStream.codecContext->time_base = m_OutputStream.stream->time_base;
                 
                 // Intra frames only, no groups of frames. Bad for compression but I don't want to handle receiving extra frames here,
