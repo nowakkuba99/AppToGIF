@@ -101,6 +101,7 @@ private:
     std::unique_ptr<Encoder> p_Encoder;
     /* --- App run variable --- */
     bool m_running = false;
+    bool m_initialized = false;
     /* --- Error reporting variable --- */
     AppToGIF::ErrorReporter m_error = AppToGIF::ErrorReporter::NoError;
     
