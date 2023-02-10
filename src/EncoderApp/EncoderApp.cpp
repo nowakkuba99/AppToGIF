@@ -61,7 +61,7 @@ void EncoderApp::worker()
         std::shared_ptr<Frame> frame = p_FrameBuffer->waitForFrame();
         if(frame != nullptr)
         {
-            std::cout<<"[WORKER] Ilość właścicieli frame?: "<<frame.use_count()<<"\n";
+            //std::cout<<"[WORKER] Ilość właścicieli frame?: "<<frame.use_count()<<"\n";
             err = p_Encoder->generateFrame(frame);
             if(err != AppToGIF::ErrorReporter::NoError) goto end;
             err = p_Encoder->addFrame();
