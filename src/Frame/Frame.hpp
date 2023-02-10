@@ -9,9 +9,12 @@
 #define frame_hpp
 #include <cinttypes>
 namespace AppToGIF {
+//Define FrameBuffer class so that it can be set as friend class
+class FrameBuffer;
 
 class Frame
 {
+    friend class FrameBuffer;
 public:
     Frame() = default;
     ~Frame()
@@ -23,10 +26,9 @@ public:
     int m_width, m_height;
     int m_maxWidth, m_maxHeight;
     int m_lineWidth;
-    
+private:
     inline void setReady() { m_ReadyToEncode = true; }
     inline bool ready() const { return m_ReadyToEncode; }
-private:
     bool m_ReadyToEncode = false;
 };
 }
