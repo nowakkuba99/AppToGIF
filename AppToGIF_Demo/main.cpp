@@ -66,5 +66,5 @@ int main()
 /* Notes */
 // No conversion option - straight to output format
 // Add option to wait for encoder and to encode when possible asynchonousMode
-// Change frame buufer appEnd to private and create setter
+// Change frame buuffer appEnd to private and create setter
 // Create build option with cmake
