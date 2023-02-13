@@ -52,6 +52,9 @@ public:
     //Returns frame filled with data from user
     std::shared_ptr<AppToGIF::Frame> waitForFrame();
     
+    //Function to set variable informing buffer that app has ended
+    inline void setAppEnd() {m_AppEnd = false;};
+    
 private:
     /* --- Buffer queue --- */
     std::queue<std::shared_ptr<AppToGIF::Frame>> m_Buffer;
@@ -64,8 +67,7 @@ private:
     bool m_APIHasFrame = false;
     std::mutex m_Mutex;
     std::condition_variable m_ConditionVariable;
-public:
-    bool m_AppEnd = false;  //Setter to write
+    bool m_AppEnd = false;
     
 };
 }
