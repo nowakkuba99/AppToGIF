@@ -27,7 +27,7 @@ int main()
     app.init(set);
     app.startEncoder();
     std::shared_ptr<AppToGIF::Frame> appFrame;
-    
+    app.setAsynchronousMode();
     for(int i = 0; i<255; i+=2)
     {
         int sin_i = std::lroundf(255 * (0.5 + 0.5 * std::sin(i * 0.01)));
@@ -44,8 +44,8 @@ int main()
                     for (int x = 0; x < 255; x++) {
                         const int index = x*4;
                         row[index + 0] = ((x+(i))&0xFF); // b
-                        row[index + 1] = 0xFF;//((y+(i))&0xFF); // g
-                        row[index + 2] = ((sin_i)&0xFF); // r
+                        row[index + 1] = ((sin_i)&0xFF);//((y+(i))&0xFF); // g
+                        row[index + 2] = 0; // r
                         row[index + 3] = 0xFF; // a
                     }
                 }
@@ -54,10 +54,12 @@ int main()
             app.passFrame();
             app.commitFrame();
         }
+        std::this_thread::sleep_for(std::chrono::microseconds(500));  //Simulate asynchronous mode -> Some work beign done my main thread
     }
     app.stopEncoder();
     app.destroyEncoder();
     
+    std::cout<<"GIF file has been created!\n";
     return 0;
 }
 
@@ -65,6 +67,4 @@ int main()
 
 /* Notes */
 // No conversion option - straight to output format
-// Add option to wait for encoder and to encode when possible asynchonousMode
-// Change frame buuffer appEnd to private and create setter
 // Create build option with cmake
