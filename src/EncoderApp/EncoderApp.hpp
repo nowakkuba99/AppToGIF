@@ -60,6 +60,10 @@ public:
         return p_FrameBuffer->commitFrame();
     }
     
+    /* --- Encoder mode setter and getter --- */
+    inline bool getIfModeAsynchonous() const {return m_asynchronousMode;};
+    inline void setAsynchronousMode() {m_asynchronousMode = true;};
+    
 private:
     /* --- Private functions --- */
     //Function executed by worker thread
@@ -102,6 +106,7 @@ private:
     /* --- App run variable --- */
     bool m_running = false;
     bool m_initialized = false;
+    bool m_asynchronousMode = false;
     /* --- Error reporting variable --- */
     AppToGIF::ErrorReporter m_error = AppToGIF::ErrorReporter::NoError;
     
