@@ -17,7 +17,7 @@ std::shared_ptr<AppToGIF::Frame> FrameBuffer::getFrame()
     std::unique_lock<std::mutex> lock(m_Mutex);
     m_ConditionVariable.wait(lock,[this]()
                                     {
-                                    return m_Buffer.size() < m_Size;
+                                    return m_Buffer.size() < m_Size || m_AsynchronousMode;
                                     });
     if(m_Buffer.size() < m_Size && !m_APIHasFrame)
     {
