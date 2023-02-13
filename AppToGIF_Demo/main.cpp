@@ -66,5 +66,5 @@ int main()
 
 
 /* Notes */
-// No conversion option - straight to output format
+// No conversion option - straight to output format TO DO NOW
 // Create build option with cmake
