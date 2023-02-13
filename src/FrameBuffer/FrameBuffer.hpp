@@ -52,6 +52,16 @@ public:
     //Returns frame filled with data from user
     std::shared_ptr<AppToGIF::Frame> waitForFrame();
     
+    //Function used to close the application
+    inline void notifyThread() {m_ConditionVariable.notify_one();};
+    
+    //Function to set variable informing buffer that app has ended
+    inline void setAppEnd() {m_AppEnd = true;};
+    
+    /* --- Encoder mode setter and getter --- */
+    inline bool getIfModeAsynchonous() const {return m_AsynchronousMode;};
+    inline void setAsynchronousMode() {m_AsynchronousMode = true;};
+    
 private:
     /* --- Buffer queue --- */
     std::queue<std::shared_ptr<AppToGIF::Frame>> m_Buffer;
@@ -62,10 +72,12 @@ private:
     
     /* --- Frame owership variables --- */
     bool m_APIHasFrame = false;
+    /* --- Multi threaded related variables --- */
     std::mutex m_Mutex;
     std::condition_variable m_ConditionVariable;
-public:
-    bool m_AppEnd = false;  //Setter to write
+    /* --- Application settings variables --- */
+    bool m_AppEnd = false;
+    bool m_AsynchronousMode = false;
     
 };
 }

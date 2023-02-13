@@ -59,11 +59,13 @@ void EncoderApp::startEncoder()
 void EncoderApp::stopEncoder()
 {
     m_running = false;
-    p_FrameBuffer->m_AppEnd = true;
+    p_FrameBuffer->setAppEnd();
 }
 //Destroy encoder thread
 void EncoderApp::destroyEncoder()
 {
+    if(p_FrameBuffer != nullptr)
+        p_FrameBuffer->notifyThread();
     if(p_WorkerThread != nullptr)
     {
         p_WorkerThread->join();
@@ -76,24 +78,24 @@ void EncoderApp::destroyEncoder()
     }
 }
 
-/* --- Private functions --- */                 //PRZEMYŚL ROLĘ FRAME BUFFER!
+/* --- Private functions --- */
 //Function executed by worker thread
 void EncoderApp::worker()
 {
     ErrorReporter err = ErrorReporter::NoError;
-    while (true) {
-        std::shared_ptr<Frame> frame = p_FrameBuffer->waitForFrame();
+    while (true)
+    {
+        std::shared_ptr<Frame> frame = p_FrameBuffer->waitForFrame();   //Get frame
         if(frame != nullptr)
         {
-            //std::cout<<"[WORKER] Ilość właścicieli frame?: "<<frame.use_count()<<"\n";
-            err = p_Encoder->generateFrame(frame);
+            err = p_Encoder->generateFrame(frame);                      //Generate AVFrame object
             if(err != AppToGIF::ErrorReporter::NoError) goto end;
-            err = p_Encoder->addFrame();
+            err = p_Encoder->addFrame();                                //Add frame to GIF file
             if(err != AppToGIF::ErrorReporter::NoError) goto end;
         }
         else
         {
-            if(!m_running)
+            if(!m_running)                                              //If nullptr is returned check if app has been closed or asynchronus mode is set
             {
                 std::lock_guard<std::mutex> lock(m_Mutex);
                 break;

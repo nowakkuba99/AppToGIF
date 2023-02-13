@@ -1,2 +1,2 @@
 # AppToGIF
-C++ library used to create GIF in real time from your application.
+C++ multithreaded library used to create GIF in real time from your application.
