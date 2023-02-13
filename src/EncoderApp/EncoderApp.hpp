@@ -61,8 +61,8 @@ public:
     }
     
     /* --- Encoder mode setter and getter --- */
-    inline bool getIfModeAsynchonous() const {return m_asynchronousMode;};
-    inline void setAsynchronousMode() {m_asynchronousMode = true;};
+    inline bool getIfModeAsynchonous() const {return p_FrameBuffer != nullptr ? p_FrameBuffer->getIfModeAsynchonous() : false;};
+    inline void setAsynchronousMode() {if(p_FrameBuffer != nullptr) p_FrameBuffer->setAsynchronousMode();};
     
 private:
     /* --- Private functions --- */

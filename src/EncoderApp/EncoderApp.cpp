@@ -64,6 +64,8 @@ void EncoderApp::stopEncoder()
 //Destroy encoder thread
 void EncoderApp::destroyEncoder()
 {
+    if(p_FrameBuffer != nullptr)
+        p_FrameBuffer->notifyThread();
     if(p_WorkerThread != nullptr)
     {
         p_WorkerThread->join();
