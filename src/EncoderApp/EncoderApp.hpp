@@ -13,10 +13,10 @@
 #include <chrono> //TO BE DELETED
 
 /* --- User includes --- */
-#include "Frame.hpp"
-#include "FrameBuffer.hpp"
-#include "Encoder.hpp"
-#include "errorReporter.h"
+#include "../Frame/Frame.hpp"
+#include "../FrameBuffer/FrameBuffer.hpp"
+#include "../encoder/Encoder.hpp"
+#include "../errorReporting/errorReporter.h"
 
 #ifndef EncoderApp_hpp
 #define EncoderApp_hpp

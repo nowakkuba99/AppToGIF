@@ -32,7 +32,8 @@ enum class ErrorReporter
     CouldNotCloseFile,
     CouldNotGetFrame,
     CouldNotCommitFrameSinceBufferIsEmpty,
-    CouldNotGenerateFrame
+    CouldNotGenerateFrame,
+    EncodingModeNotSelected
 };
 }
 #endif /* errorReporter_h */
