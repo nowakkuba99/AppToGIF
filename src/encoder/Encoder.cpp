@@ -18,29 +18,29 @@ ErrorReporter Encoder::init()
     if (error < 0) {
         return ErrorReporter::CouldNotAllocateFormatContext;
     }
-
+    
     /* -------------- Check outputFormat from allocated formatContext --------------*/
     m_OutputStream.outputFormat = const_cast<AVOutputFormat*>(m_OutputStream.formatContext->oformat);
     if (m_OutputStream.outputFormat->video_codec != AV_CODEC_ID_NONE) {
         // Finding a registered encoder with a matching codec ID...
-         m_OutputStream.codec = const_cast<AVCodec*>(avcodec_find_encoder(m_OutputStream.outputFormat->video_codec));
+        m_OutputStream.codec = const_cast<AVCodec*>(avcodec_find_encoder(m_OutputStream.outputFormat->video_codec));
         if (m_OutputStream.codec == NULL) {
             return ErrorReporter::CouldNotFindEncoder;
         }
-
-       /* -------------- Allocate new output stream --------------*/
+        
+        /* -------------- Allocate new output stream --------------*/
         m_OutputStream.stream= avformat_new_stream(m_OutputStream.formatContext, m_OutputStream.codec);
         if (m_OutputStream.stream== NULL) {
             return ErrorReporter::CouldNotAllocateOutputStream;
         }
         m_OutputStream.stream->id = m_OutputStream.formatContext->nb_streams - 1;
-
+        
         /* -------------- Allocate codecContext --------------*/
         m_OutputStream.codecContext = avcodec_alloc_context3(m_OutputStream.codec);
         if (m_OutputStream.codecContext == NULL) {
             return ErrorReporter::CouldNotAllocateCodecContext;
         }
-
+        
         /* -------------- Check codecType --------------*/
         switch (m_OutputStream.codec->type)
         {
@@ -80,12 +80,12 @@ ErrorReporter Encoder::init()
                 break;
             }
         }
-
+        
         if (m_OutputStream.formatContext->oformat->flags & AVFMT_GLOBALHEADER) {
             m_OutputStream.codecContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
         }
     }
-
+    
     /* -------------- Open avCodecContext --------------*/
     error = avcodec_open2(m_OutputStream.codecContext, m_OutputStream.codec, NULL);
     if (error < 0) {
@@ -99,7 +99,7 @@ ErrorReporter Encoder::init()
     
     /* -------------- Print information about file about to be created --------------*/
     av_dump_format(m_OutputStream.formatContext, 0, m_Settings.fileName.data(), 1);
-
+    
     
     /* -------------- Open file towrite to --------------*/
     if (!(m_OutputStream.outputFormat->flags & AVFMT_NOFILE)) {
@@ -109,18 +109,18 @@ ErrorReporter Encoder::init()
             return ErrorReporter::CouldNotOpenNewFile;
         }
     }
-
+    
     /* -------------- Write file header --------------*/
     error = avformat_write_header(m_OutputStream.formatContext, NULL);
     if (error < 0) {
         return ErrorReporter::CouldNotWriteHeader;
     }
-//    else if (error == AVSTREAM_INIT_IN_WRITE_HEADER) {
-//        std::cerr << "AVSTREAM_INIT_IN_WRITE_HEADER" << std::endl;  // informational message, not an error
-//    }
-//    else if (error == AVSTREAM_INIT_IN_INIT_OUTPUT) {
-//        std::cerr << "AVSTREAM_INIT_IN_INIT_OUTPUT" << std::endl;  // informational message, not an error
-//    }
+    //    else if (error == AVSTREAM_INIT_IN_WRITE_HEADER) {
+    //        std::cerr << "AVSTREAM_INIT_IN_WRITE_HEADER" << std::endl;  // informational message, not an error
+    //    }
+    //    else if (error == AVSTREAM_INIT_IN_INIT_OUTPUT) {
+    //        std::cerr << "AVSTREAM_INIT_IN_INIT_OUTPUT" << std::endl;  // informational message, not an error
+    //    }
     
     /* -------------- Allocate packet --------------*/
     m_OutputStream.packet = av_packet_alloc();
@@ -130,7 +130,7 @@ ErrorReporter Encoder::init()
     /* -------------- Initiliaze packet --------------*/
     m_OutputStream.packet->data = NULL;
     m_OutputStream.packet->size = 0;
-
+    
     
     /* -------------- Prepare AVFrames --------------*/
     // Here we need 3 frames for encoding. Basically, the QImage is firstly extracted in AV_PIX_FMT_BGRA.
@@ -147,7 +147,7 @@ ErrorReporter Encoder::init()
     m_OutputStream.frame->width = m_OutputStream.codecContext->width;
     m_OutputStream.frame->height = m_OutputStream.codecContext->height;
     m_OutputStream.frame->format = m_OutputStream.codecContext->pix_fmt;
-
+    
     /* -------------- Set parameters - tmpFrame --------------*/
     m_OutputStream.tmpFrame->width = m_OutputStream.codecContext->width;
     m_OutputStream.tmpFrame->height = m_OutputStream.codecContext->height;
@@ -157,14 +157,13 @@ ErrorReporter Encoder::init()
     m_OutputStream.yuvFrame->width = m_OutputStream.codecContext->width;
     m_OutputStream.yuvFrame->height = m_OutputStream.codecContext->height;
     m_OutputStream.yuvFrame->format = AV_PIX_FMT_YUV420P;
-
     
     /* -------------- Check if tmpframe is writable --------------*/
     error = av_frame_is_writable(m_OutputStream.tmpFrame);
     if (error < 0) {
         return ErrorReporter::FrameisNotWritable;
     }
-
+    
     /* -------------- Check if frame is writable --------------*/
     error = av_frame_is_writable(m_OutputStream.frame);
     if (error < 0) {
@@ -176,7 +175,7 @@ ErrorReporter Encoder::init()
     if (error < 0) {
         return ErrorReporter::FrameisNotWritable;
     }
-    
+
     /* -------------- Allocate image data for tmpFrame --------------*/
     error = av_image_alloc(m_OutputStream.tmpFrame->data, m_OutputStream.tmpFrame->linesize, m_Settings.inputWidth, m_Settings.inputHeight, AV_PIX_FMT_BGRA, 32);
     if (error < 0) {
@@ -188,53 +187,58 @@ ErrorReporter Encoder::init()
     if (error < 0) {
         return ErrorReporter::CouldNotAllocateImageForFrame;
     }
-
+    
     /* -------------- Allocate image data for frame --------------*/
     error = av_image_alloc(m_OutputStream.frame->data, m_OutputStream.frame->linesize, m_Settings.inputWidth, m_Settings.inputHeight, m_OutputStream.codecContext->pix_fmt, 32);
     if (error < 0) {
         return ErrorReporter::CouldNotAllocateImageForFrame;
     }
-
-    if(m_Settings.doubleEncoding == true)
+    
+    if(m_Settings.directEncoding == false)
     {
-        /* -------------- Allocate scale context for BGRA -> YUV420P --------------*/
-        if (!m_OutputStream.swsCtx) {
-            m_OutputStream.swsCtx = sws_getContext(m_Settings.inputWidth, m_Settings.inputHeight,
-                                    AV_PIX_FMT_BGRA,
-                                    m_Settings.inputWidth, m_Settings.inputHeight,
-                                    AV_PIX_FMT_YUV420P,
-                                    SWS_BICUBIC, NULL, NULL, NULL);
-            if (m_OutputStream.swsCtx == nullptr) {
-                return ErrorReporter::CouldNotAllocateContextForScaler;
-            }
-        }
-        
-        /* -------------- Allocate scale context for YUV420P -> RGB8 --------------*/
-        if (!m_OutputStream.swsGIFCtx) {
-            m_OutputStream.swsGIFCtx = sws_getContext(m_Settings.inputWidth, m_Settings.inputHeight,
-                                       AV_PIX_FMT_YUV420P,
-                                       m_OutputStream.codecContext->width, m_OutputStream.codecContext->height,
-                                       m_OutputStream.codecContext->pix_fmt,
-                                       SWS_BICUBIC, NULL, NULL, NULL);
-            if (m_OutputStream.swsGIFCtx == nullptr) {
-                return ErrorReporter::CouldNotAllocateContextForScaler;
-            }
-        }
-    }
-    else
-    {
-        /* -------------- Allocate scale context for YUV420P -> RGB8 --------------*/
-        if(!m_OutputStream.swsFast)
+        if(m_Settings.bgraEncoding == true)
         {
-            m_OutputStream.swsFast = sws_getContext(m_Settings.inputWidth, m_Settings.inputHeight,
-                                     AV_PIX_FMT_BGRA,
-                                     m_OutputStream.codecContext->width,m_OutputStream.codecContext->height,
-                                     m_OutputStream.codecContext->pix_fmt,
-                                     SWS_BICUBIC, NULL, NULL, NULL);
-            if(m_OutputStream.swsFast == nullptr) {
-                return ErrorReporter::CouldNotAllocateContextForScaler;
+            /* -------------- Allocate scale context for BGRA -> RGB8 --------------*/
+            if(!m_OutputStream.swsFast)
+            {
+                m_OutputStream.swsFast = sws_getContext(m_Settings.inputWidth, m_Settings.inputHeight,
+                                                        AV_PIX_FMT_BGRA,
+                                                        m_OutputStream.codecContext->width,m_OutputStream.codecContext->height,
+                                                        m_OutputStream.codecContext->pix_fmt,
+                                                        SWS_BICUBIC, NULL, NULL, NULL);
+                if(m_OutputStream.swsFast == nullptr) {
+                    return ErrorReporter::CouldNotAllocateContextForScaler;
+                }
             }
         }
+        else if(m_Settings.doubleEncoding == true)
+        {
+            /* -------------- Allocate scale context for BGRA -> YUV420P --------------*/
+            if (!m_OutputStream.swsCtx) {
+                m_OutputStream.swsCtx = sws_getContext(m_Settings.inputWidth, m_Settings.inputHeight,
+                                                       AV_PIX_FMT_BGRA,
+                                                       m_Settings.inputWidth, m_Settings.inputHeight,
+                                                       AV_PIX_FMT_YUV420P,
+                                                       SWS_BICUBIC, NULL, NULL, NULL);
+                if (m_OutputStream.swsCtx == nullptr) {
+                    return ErrorReporter::CouldNotAllocateContextForScaler;
+                }
+            }
+            
+            /* -------------- Allocate scale context for YUV420P -> RGB8 --------------*/
+            if (!m_OutputStream.swsGIFCtx) {
+                m_OutputStream.swsGIFCtx = sws_getContext(m_Settings.inputWidth, m_Settings.inputHeight,
+                                                          AV_PIX_FMT_YUV420P,
+                                                          m_OutputStream.codecContext->width, m_OutputStream.codecContext->height,
+                                                          m_OutputStream.codecContext->pix_fmt,
+                                                          SWS_BICUBIC, NULL, NULL, NULL);
+                if (m_OutputStream.swsGIFCtx == nullptr) {
+                    return ErrorReporter::CouldNotAllocateContextForScaler;
+                }
+            }
+        }
+        else
+            return ErrorReporter::EncodingModeNotSelected;
     }
     
     return ErrorReporter::NoError;
@@ -244,17 +248,33 @@ ErrorReporter Encoder::init()
 //Function used to convert data from Frame object to AVframe
 ErrorReporter Encoder::generateFrame(AppToGIF::Frame* srcFrame)
 {
-    const int pixelSize = m_Settings.inputAlpha
-            ? 4 * sizeof(uint8_t)
-            : 3 * sizeof(uint8_t);
-    if(srcFrame != nullptr)
+    if(m_Settings.bgraEncoding || m_Settings.doubleEncoding)
     {
-        memcpy(
-               m_OutputStream.tmpFrame->data[0],
-               srcFrame->m_rgb,
-               (size_t)srcFrame->m_width * srcFrame->m_height * pixelSize);
-        return ErrorReporter::NoError;
+        const int pixelSize = m_Settings.inputAlpha
+        ? 4 * sizeof(uint8_t)
+        : 3 * sizeof(uint8_t);
+        if(srcFrame != nullptr)
+        {
+            memcpy(
+                   m_OutputStream.tmpFrame->data[0],
+                   srcFrame->m_rgb,
+                   (size_t)srcFrame->m_width * srcFrame->m_height * pixelSize);
+            return ErrorReporter::NoError;
+        }
     }
+    else if (m_Settings.directEncoding)
+    {
+        if(srcFrame != nullptr)
+        {
+            memcpy(
+                   m_OutputStream.frame->data[0],
+                   srcFrame->m_rgb,
+                   (size_t)srcFrame->m_width * srcFrame->m_height * 3);
+            return ErrorReporter::NoError;
+        }
+    }
+    else
+        return ErrorReporter::EncodingModeNotSelected;
     return ErrorReporter::CouldNotGenerateFrame;
 
 }//generateFrame
@@ -262,17 +282,33 @@ ErrorReporter Encoder::generateFrame(AppToGIF::Frame* srcFrame)
 //Function used to convert data from frame object to AVframe
 ErrorReporter Encoder::generateFrame(std::shared_ptr<AppToGIF::Frame> srcFrame)
 {
-    const int pixelSize = m_Settings.inputAlpha
-            ? 4 * sizeof(uint8_t)
-            : 3 * sizeof(uint8_t);
-    if(srcFrame != nullptr)
+    if(m_Settings.bgraEncoding || m_Settings.doubleEncoding)
     {
-        memcpy(
-               m_OutputStream.tmpFrame->data[0],
-               srcFrame->m_rgb,
-               (size_t)srcFrame->m_width * srcFrame->m_height * pixelSize);
-        return ErrorReporter::NoError;
+        const int pixelSize = m_Settings.inputAlpha
+        ? 4 * sizeof(uint8_t)
+        : 3 * sizeof(uint8_t);
+        if(srcFrame != nullptr)
+        {
+            memcpy(
+                   m_OutputStream.tmpFrame->data[0],
+                   srcFrame->m_rgb,
+                   (size_t)srcFrame->m_width * srcFrame->m_height * pixelSize);
+            return ErrorReporter::NoError;
+        }
     }
+    else if (m_Settings.directEncoding)
+    {
+        if(srcFrame != nullptr)
+        {
+            memcpy(
+                   m_OutputStream.frame->data[0],
+                   srcFrame->m_rgb,
+                   (size_t)srcFrame->m_width * srcFrame->m_height);
+            return ErrorReporter::NoError;
+        }
+    }
+    else
+        return ErrorReporter::EncodingModeNotSelected;
     return ErrorReporter::CouldNotGenerateFrame;
 }
 
@@ -282,45 +318,48 @@ ErrorReporter Encoder::addFrame()
 {
     int error;
 
-    /* If double encoding perform BRGA -> YUV420P -> RGB8*/
-    if(m_Settings.doubleEncoding)
+    if(m_Settings.directEncoding == false)
     {
-        // This double scaling prevent some artifacts on the GIF and improve
-        // significantly the display quality
-        if (m_OutputStream.swsCtx != nullptr)
+        if(m_Settings.bgraEncoding == true)     //Single BGRA -> RGB8
         {
-            sws_scale(m_OutputStream.swsCtx,
-                      (const uint8_t * const *)m_OutputStream.tmpFrame->data,
-                      m_OutputStream.tmpFrame->linesize,
-                      0,
-                      m_OutputStream.codecContext->height,
-                      m_OutputStream.yuvFrame->data,
-                      m_OutputStream.yuvFrame->linesize);
+            if(m_OutputStream.swsFast != nullptr)
+            {
+                sws_scale(m_OutputStream.swsFast,
+                          (const uint8_t * const *)m_OutputStream.tmpFrame->data,
+                          m_OutputStream.tmpFrame->linesize,
+                          0,
+                          m_OutputStream.codecContext->height,
+                          m_OutputStream.frame->data,
+                          m_OutputStream.frame->linesize);
+            }
         }
-        if (m_OutputStream.swsGIFCtx != nullptr)
+        else if(m_Settings.doubleEncoding)      /* If double encoding perform BRGA -> YUV420P -> RGB8*/
         {
-            sws_scale(m_OutputStream.swsGIFCtx,
-                      (const uint8_t * const *)m_OutputStream.yuvFrame->data,
-                      m_OutputStream.yuvFrame->linesize,
-                      0,
-                      m_OutputStream.codecContext->height,
-                      m_OutputStream.frame->data,
-                      m_OutputStream.frame->linesize);
+            // This double scaling is said to prevent some artifacts on the GIF and improve
+            // significantly the display quality HOWEVER for me it does not really work
+            if (m_OutputStream.swsCtx != nullptr)
+            {
+                sws_scale(m_OutputStream.swsCtx,
+                          (const uint8_t * const *)m_OutputStream.tmpFrame->data,
+                          m_OutputStream.tmpFrame->linesize,
+                          0,
+                          m_OutputStream.codecContext->height,
+                          m_OutputStream.yuvFrame->data,
+                          m_OutputStream.yuvFrame->linesize);
+            }
+            if (m_OutputStream.swsGIFCtx != nullptr)
+            {
+                sws_scale(m_OutputStream.swsGIFCtx,
+                          (const uint8_t * const *)m_OutputStream.yuvFrame->data,
+                          m_OutputStream.yuvFrame->linesize,
+                          0,
+                          m_OutputStream.codecContext->height,
+                          m_OutputStream.frame->data,
+                          m_OutputStream.frame->linesize);
+            }
         }
     }
-    else    //Single BGRA -> RGB8
-    {
-        if(m_OutputStream.swsFast != nullptr)
-        {
-            sws_scale(m_OutputStream.swsFast,
-                      (const uint8_t * const *)m_OutputStream.tmpFrame->data,
-                      m_OutputStream.tmpFrame->linesize,
-                      0,
-                      m_OutputStream.codecContext->height,
-                      m_OutputStream.frame->data,
-                      m_OutputStream.frame->linesize);
-        }
-    }
+    
 
     /* -------------- Increase frame->pts --------------*/
     m_OutputStream.frame->pts = m_OutputStream.nextPts++;
