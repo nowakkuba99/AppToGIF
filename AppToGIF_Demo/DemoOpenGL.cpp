@@ -145,7 +145,6 @@ void init() {
     set.bitRate = 100000;
     set.frameRate = 90;
     set.bitRate = 10000;
-    set.directEncoding = false;
     set.bgraEncoding = true;
     app.init(set);
     app.startEncoder();
@@ -179,9 +178,6 @@ void display() {
             if(appFrame != nullptr)
             {
                 counter++;
-                appFrame->m_width=800;
-                appFrame->m_height=600;
-                appFrame->m_rgb = new uint8_t[static_cast<size_t>(set.outputHeight)*lineWidth];
                 unsigned long buffCount = 0;
                 for (int y = set.outputHeight-1; y >=0; y--) {
                     uint8_t *row = &appFrame->m_rgb[(y) * lineWidth];
@@ -250,5 +246,5 @@ int mainW(int argc, char** argv) {
   glutTimerFunc(100, timer, 0);
   init();
   glutMainLoop();
-    return 0;
+  return 0;
 }

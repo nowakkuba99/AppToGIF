@@ -42,11 +42,8 @@ int main()
         {
             {
                 std::cout<<"Frame: "<<++counter<<"\n";
-                appFrame->m_width=255;
-                appFrame->m_height=255;
-                appFrame->m_rgb = new uint8_t[static_cast<size_t>(set.outputHeight)*lineWidth];
                 for (int y = 0; y < set.outputHeight ; y++) {
-                    uint8_t *row = &appFrame->m_rgb[y * lineWidth];
+                    uint8_t *row = appFrame->getRow(y);
                     for (int x = 0; x < set.outputWidth; x++) {
                         //const int index = x*4;  //4 for alpha channel
                         row[x] = (sin_i)&255;//((x+(i))&0xFF); //
@@ -73,10 +70,7 @@ int main()
 
 
 /* Notes */
-// No conversion option - straight to output format TO DO NOW
 // Build in features like:
-// - setting frame width and height
 // - appFrame->getrow(),
-// - automatic linewidth calcuation
 // Fix issue with black line at the bottom
 // Create build option with cmake
