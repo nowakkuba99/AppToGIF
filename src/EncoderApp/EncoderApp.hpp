@@ -22,6 +22,12 @@
 #define EncoderApp_hpp
 namespace AppToGIF
 {
+struct FrameData
+{
+    int width = 0;
+    int height = 0;
+    int lineWidth = 0;
+};
 class EncoderApp
 {
 public:
@@ -45,7 +51,15 @@ public:
     //Returns frame if possible and nullptr if frameBuffer is full
     inline std::shared_ptr<AppToGIF::Frame> getFrame()
     {
-        return p_FrameBuffer->getFrame();
+        auto temp = p_FrameBuffer->getFrame();
+        if(temp != nullptr)
+        {
+            temp->m_width = m_FrameData.width;
+            temp->m_height = m_FrameData.height;
+            temp->m_lineWidth = m_FrameData.lineWidth;
+            temp->m_rgb =  new uint8_t[static_cast<size_t>(m_FrameData.height)*m_FrameData.lineWidth];
+        }
+        return temp;
     }
     //Get frame filled with data to frame buffer
     //The app can no longer have access to data in order to work
@@ -109,7 +123,8 @@ private:
     bool m_asynchronousMode = false;
     /* --- Error reporting variable --- */
     AppToGIF::ErrorReporter m_error = AppToGIF::ErrorReporter::NoError;
-    
+    /* --- Frame data --- */
+    FrameData m_FrameData;
 };
 }
     
