@@ -6,10 +6,13 @@ C++ multithreaded library used to create GIF in real time from your application.
 The main two features of library are:
 - Asynchronous mode: Ability to create gif files in 'real time',
 - Synchronous mode:  Ability to render gif files with all avaialbe frames
- ## Documentation and examples
+ ## Examples
+**Bounction balls**  
+<img src="https://github.com/nowakkuba99/AppToGIF/blob/main/resources/BouncingBalls.gif" >
+OpenGL render code source: [OpenGL Examples](https://cs.lmu.edu/~ray/notes/openglexamples/).
+ ### Documentation
  This section goes over creating AppToGIF singeleton instance, initialization and how to use it in your app.
  Along with use cases few demo-app's are beign included in demo folder and shortly presented below.
- ### Documentation
  1. AppToGIF instance creation
  The library instance can be obtained as singelton object and assigned to EncoderApp reference object as showed below.
 ```c++
