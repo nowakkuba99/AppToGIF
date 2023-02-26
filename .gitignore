@@ -259,3 +259,4 @@ AppToGIF.xcodeproj/
 *.plist
 *.xcuserstate
 Debug-alias/
+Debug-alias
