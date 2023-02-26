@@ -7,7 +7,7 @@ The main two features of library are:
 - Asynchronous mode: Ability to create gif files in 'real time',
 - Synchronous mode:  Ability to render gif files with all avaialbe frames
  ## Examples
-**Bounction balls**  
+**Bouncing balls**  
 <p align="center">
 <img src="https://github.com/nowakkuba99/AppToGIF/blob/main/resources/BouncingBalls.gif" >
 </p>   
