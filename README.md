@@ -12,7 +12,7 @@ The main two features of library are:
 <img src="https://github.com/nowakkuba99/AppToGIF/blob/main/resources/BouncingBalls.gif" >
 </p>   
 
-OpenGL render code source: [OpenGL Examples](https://cs.lmu.edu/~ray/notes/openglexamples/).
+OpenGL render code source: [OpenGL Examples](https://cs.lmu.edu/~ray/notes/openglexamples/). In demos folder full source code with AppToGIF addition is avaiable to look through: `AppToGIF_Demo/DemoOpenGL.cpp`.
  ### Documentation
  This section goes over creating AppToGIF singeleton instance, initialization and how to use it in your app.
  Along with use cases few demo-app's are beign included in demo folder and shortly presented below.
