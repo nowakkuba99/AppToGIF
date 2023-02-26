@@ -12,8 +12,8 @@
 #include <mutex>
 #include <condition_variable>
 
-#include "Frame.hpp"
-#include "errorReporter.h"
+#include "../Frame/Frame.hpp"
+#include "../errorReporting/errorReporter.h"
 
 #ifndef FrameBuffer_hpp
 #define FrameBuffer_hpp

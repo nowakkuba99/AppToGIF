@@ -10,9 +10,9 @@
 /* --- Includes ---*/
 #include <string>
 /* --- User incldues --- */
-#include "ffmpeg.h"
-#include "errorReporter.h"
-#include "Frame.hpp"
+#include "../../include/ffmpeg.h"
+#include "../errorReporting/errorReporter.h"
+#include "../Frame/Frame.hpp"
 
 
 namespace AppToGIF {
@@ -26,6 +26,8 @@ struct GIFSettings {
     int outputHeight = 400;
     int frameRate = 11;
     int bitRate = 1000;
+    bool directEncoding = false;
+    bool bgraEncoding = true;;
     bool doubleEncoding = false;
     bool inputAlpha = true;
 };

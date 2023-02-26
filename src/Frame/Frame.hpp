@@ -22,10 +22,12 @@ public:
         delete [] m_rgb;
     }
 
-    uint8_t *m_rgb;
+    uint8_t* m_rgb;
     int m_width, m_height;
     int m_maxWidth, m_maxHeight;
     int m_lineWidth;
+    
+    inline uint8_t* getRow(int rowNum) {return &m_rgb[rowNum * m_lineWidth];};
 private:
     inline void setReady() { m_ReadyToEncode = true; }
     inline bool ready() const { return m_ReadyToEncode; }

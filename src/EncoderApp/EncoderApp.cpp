@@ -22,6 +22,12 @@ void EncoderApp::init(AppToGIF::GIFSettings settings)
         settings.frameRate=100;
         std::cerr<<"Max frame rate for gif files is 100.\n";
     }
+    /* Check the encoding mode selection */
+    if(!settings.directEncoding && !settings.bgraEncoding && !settings.doubleEncoding)
+    {
+        settings.bgraEncoding = true;
+        std::cerr<<"No encoding mode selected! Defualt bgraEncding selection done.\n";
+    }
     p_Encoder = std::make_unique<Encoder>(settings);    //Create encoder object
     p_FrameBuffer = std::make_unique<FrameBuffer>();    //Create FrameBuffer
     
@@ -36,6 +42,12 @@ void EncoderApp::init(AppToGIF::GIFSettings settings)
         m_initialized = false;
         std::cerr<<"Error while initializing encoder! \n";
     }
+    m_FrameData.width = settings.inputWidth;
+    m_FrameData.height = settings.inputHeight;
+    if(settings.directEncoding == true)
+        m_FrameData.lineWidth = av_image_get_linesize(AV_PIX_FMT_RGB8, settings.inputWidth, 0);
+    else if(settings.bgraEncoding == true || settings.doubleEncoding == true)
+        m_FrameData.lineWidth = av_image_get_linesize(AV_PIX_FMT_BGRA, settings.inputWidth, 0);
 }
 
 //Start the encoderApp - start second thread
