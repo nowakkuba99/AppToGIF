@@ -8,7 +8,10 @@ The main two features of library are:
 - Synchronous mode:  Ability to render gif files with all avaialbe frames
  ## Examples
 **Bounction balls**  
+<p align="center">
 <img src="https://github.com/nowakkuba99/AppToGIF/blob/main/resources/BouncingBalls.gif" >
+</p>   
+
 OpenGL render code source: [OpenGL Examples](https://cs.lmu.edu/~ray/notes/openglexamples/).
  ### Documentation
  This section goes over creating AppToGIF singeleton instance, initialization and how to use it in your app.
