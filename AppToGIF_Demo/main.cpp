@@ -12,10 +12,9 @@
 /* --- Main function --- */
 int main()
 {
-    //const int lineWidth = av_image_get_linesize(AV_PIX_FMT_BGRA, 255, 0);
-    const int lineWidth = av_image_get_linesize(AV_PIX_FMT_RGB8, 255, 0);
-
+    /* -- App object --- */
     AppToGIF::EncoderApp& app = AppToGIF::EncoderApp::getInstance();
+    /* --- GIF settings --- */
     AppToGIF::GIFSettings set;
     set.fileName = "AppToGIF.gif";
     set.inputHeight = 255;
@@ -25,41 +24,50 @@ int main()
     set.bitRate = 100000;
     set.frameRate = 50;
     set.bitRate = 10000;
-    //set.inputAlpha = true;
     set.directEncoding = true;;
     set.bgraEncoding = false;
     set.doubleEncoding = false;
+    /* --- Encoder initialization and starting --- */
     app.init(set);
     app.startEncoder();
-    std::shared_ptr<AppToGIF::Frame> appFrame;
     app.setAsynchronousMode();
+    /* --- Frame used to feed encoder with data --- */
+    std::shared_ptr<AppToGIF::Frame> appFrame;
+    
+    
+    /* --- Main GIF Creating loop --- */
     int counter = 0;
     for(int i = 0; i<255; i++)
     {
-        int sin_i = std::lroundf(255 * (0.5 + 0.5 * std::sin(i * 0.01)));
+        int sin_i = static_cast<int>( std::lroundf(255 * (0.5 + 0.5 * std::sin(i * 0.01))));
+        /* --- Get Frame form encdoer --- */
         appFrame = app.getFrame();
-        if(appFrame != nullptr)
+        if(appFrame != nullptr)                                             // If frame is not nullptr - frame ready
         {
+            std::cout<<"Frame: "<<++counter<<"\n";
+            for (int y = 0; y < appFrame->m_height ; y++)
             {
-                std::cout<<"Frame: "<<++counter<<"\n";
-                for (int y = 0; y < set.outputHeight ; y++) {
-                    uint8_t *row = appFrame->getRow(y);
-                    for (int x = 0; x < set.outputWidth; x++) {
-                        //const int index = x*4;  //4 for alpha channel
-                        row[x] = (sin_i)&255;//((x+(i))&0xFF); //
+                uint8_t *row = appFrame->getRow(y);
+                for (int x = 0; x < appFrame->m_width; x++)
+                {
+                    //const int index = x*4;  //4 for alpha channel
+                    row[x] = (sin_i)&255;//((x+(i))&0xFF); //
 //                        row[index + 0] = ((sin_i+(i))&0xFF);    //b
 //                        row[index + 1] = ((128)&0xFF);    //g
 //                        row[index + 2] = ((sin_i+(i))&0xFF);    //r
 //                        row[index + 3] = 0xFF; // a
-                    }
                 }
             }
+            /* --- Reset frame pointer to lose ownership --- */
             appFrame.reset();
+            /* --- Pass frame to encoder --- */
             app.passFrame();
+            /* --- If no more frames need to be pased to the queue - commit frame --- */
             app.commitFrame();
         }
         std::this_thread::sleep_for(std::chrono::microseconds(500));  //Simulate asynchronous mode -> Some work beign done my main thread
     }
+    /* --- Finaly stop and destroy Encoder --- */
     app.stopEncoder();
     app.destroyEncoder();
     
@@ -71,6 +79,5 @@ int main()
 
 /* Notes */
 // Build in features like:
-// - appFrame->getrow(),
 // Fix issue with black line at the bottom
 // Create build option with cmake
