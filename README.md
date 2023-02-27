@@ -13,16 +13,16 @@ The main two features of library are:
 </p>   
 
 OpenGL render code source: [OpenGL Examples](https://cs.lmu.edu/~ray/notes/openglexamples/). In demos folder full source code with AppToGIF addition is avaiable to look through: `AppToGIF_Demo/DemoOpenGL.cpp`.
- ### Documentation
+ ## Documentation
  This section goes over creating AppToGIF singeleton instance, initialization and how to use it in your app.
- Along with use cases few demo-app's are beign included in demo folder and shortly presented below.
- 1. AppToGIF instance creation
+ Along with use cases few demo-app's are beign included in demo folder and shortly presented below.   
+ **1. AppToGIF instance creation**   
  The library instance can be obtained as singelton object and assigned to EncoderApp reference object as showed below.
 ```c++
 /* -- AppToGIF object --- */
 AppToGIF::EncoderApp& app = AppToGIF::EncoderApp::getInstance();
 ```
-2. Initialization
+**2. Initialization**   
 In order to initialize AppToGIF object one need to pass the GIF settings into the initialization function.
 ```c++
 /* --- GIF settings --- */
@@ -86,6 +86,7 @@ The default behaviour is the **Synchronous mode** and the **Asynchronous mode** 
 ```c++
 app.setAsynchronousMode();
 ```
+**3. Encoding frames**  
 In order to feed the encoder with frame data one needs to create a Frame pointer that will be later filled with image data
 ```c++
 /* --- Frame used to feed encoder with data --- */
@@ -102,7 +103,7 @@ and then passing and commiting a frame.
 Below a basic encoding procedure has been presented that can be inserted inside the render loop of YourApp.
 ```c++
 /* --- Inside a render loop --- */
-if(appFrame != nullptr)                             // Check gf frame is not nullptr - only in asynchronous mode
+if(appFrame != nullptr)                 // Check gf frame is not nullptr - only in asynchronous mode
 {
     std::cout<<"Frame: "<<++counter<<"\n";
     for (int y = 0; y < appFrame->m_height ; y++)
@@ -125,3 +126,13 @@ if(appFrame != nullptr)                             // Check gf frame is not nul
     app.commitFrame();
 }
 ```
+>Note: You can limit the number of frames that you want to include in your GIF file by using surrounding code above with simple if statement.
+
+**4. Finalizing operations**  
+After you are done with all frames you wanted to encode, the final two operations need to be performned to ensure correct gif file tail encoding along with resource dealocation.
+```c++
+/* --- Finaly stop and destroy Encoder --- */
+app.stopEncoder();
+app.destroyEncoder();
+```
+Destroying encoder is not necessary since resources will be deallocated upon objects destruction, however is recommended if you want to use YourApp after creating GIF file.
