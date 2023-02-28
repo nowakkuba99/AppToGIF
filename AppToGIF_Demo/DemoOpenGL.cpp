@@ -138,10 +138,10 @@ void init() {
     
     /* --- AppToGIF --- */
     set.fileName = "AppToGIF.gif";
-    set.inputHeight = 600;
-    set.inputWidth = 800;
-    set.outputWidth = 800;
-    set.outputHeight = 600;
+    set.inputHeight = 300;
+    set.inputWidth = 1000;
+    set.outputWidth = 1000;
+    set.outputHeight = 300;
     set.bitRate = 100000;
     set.frameRate = 90;
     set.bitRate = 10000;
@@ -180,7 +180,7 @@ void display() {
                 counter++;
                 unsigned long buffCount = 0;
                 for (int y = set.outputHeight-1; y >=0; y--) {
-                    uint8_t *row = &appFrame->m_rgb[(y) * lineWidth];
+                    uint8_t *row = appFrame->getRow(y);
                     for (int x=0;x<set.outputWidth;x++){
                         const int index = x*4;
                         row[index + 0] = buffer[buffCount++];
@@ -234,11 +234,11 @@ void special(int key, int, int) {
 }
 
 // Initializes GLUT and enters the main loop.
-int mainW(int argc, char** argv) {
+int main(int argc, char** argv) {
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
   glutInitWindowPosition(80, 80);
-  glutInitWindowSize(800,600);
+  glutInitWindowSize(1000,300);
   glutCreateWindow("Bouncing Balls");
   glutDisplayFunc(display);
   glutReshapeFunc(reshape);

@@ -10,7 +10,7 @@
 #include "AppToGIF.h"
 
 /* --- Main function --- */
-int main()
+int mainW()
 {
     /* -- App object --- */
     AppToGIF::EncoderApp& app = AppToGIF::EncoderApp::getInstance();
@@ -33,8 +33,8 @@ int main()
     app.setAsynchronousMode();
     /* --- Frame used to feed encoder with data --- */
     std::shared_ptr<AppToGIF::Frame> appFrame;
-    
-    
+    /* --- Error reporter object --- */
+    AppToGIF::ErrorReporter errorObj;
     /* --- Main GIF Creating loop --- */
     int counter = 0;
     for(int i = 0; i<255; i++)
@@ -61,9 +61,13 @@ int main()
             /* --- Reset frame pointer to lose ownership --- */
             appFrame.reset();
             /* --- Pass frame to encoder --- */
-            app.passFrame();
+            errorObj = app.passFrame();
+            if(errorObj != AppToGIF::ErrorReporter::NoError)
+                std::cerr<<"Error occured while passing frame to encoder. Check error code.\n";
             /* --- If no more frames need to be pased to the queue - commit frame --- */
-            app.commitFrame();
+            errorObj = app.commitFrame();
+            if(errorObj != AppToGIF::ErrorReporter::NoError)
+                std::cerr<<"Error occured while commiting frame to encoder. Check error code.\n";
         }
         std::this_thread::sleep_for(std::chrono::microseconds(500));  //Simulate asynchronous mode -> Some work beign done my main thread
     }

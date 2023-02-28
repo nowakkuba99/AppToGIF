@@ -36,19 +36,50 @@ public:
     void operator=(const EncoderApp&) = delete;
     
     /* --- Functions to be called by user --- */
-    
-    //Initialize FrameBuffer and set video settings
+    /**
+     * Initialize FrameBuffer and set video settings.
+     *
+     * After specifying settings for the encoder, the application will be initialized with given settings.
+     * @param settings Settings structure that specifies how you want to create your GIF file
+     */
     void init(AppToGIF::GIFSettings settings);
-    //Start the encoderApp - start second thread
+    
+    /**
+     * Starting the flow related to the encoder application.
+     *
+     * Function starts the second thread and related with it worker function that encodes GIF files in
+     * the background. Function uses condition variables and mutexes to avoid confilts with your main app.
+     */
     void startEncoder();
-    //Stop the encoderApp when file is ready
+    
+    /**
+     * Function stops endocer when all frames that you wanted to encode where written to the file.
+     *
+     * Function call results in ending worker thread and writing tail to a GIF file that is necessary to correct encoding.
+     */
     void stopEncoder();
-    //Destroy encoder thread
+    
+    /**
+     * Free allocated data related with encoder app.
+     *
+     * Calling this function free's all resources related to the encoder app. This step is not necessary however when you want to use your application
+     * after creating GIF file.
+     */
     void destroyEncoder();
     
     /* --- Frames related functions --- */
-    //Get frame that can be filled with data
-    //Returns frame if possible and nullptr if frameBuffer is full
+    /**
+     * Get frame that can be filled with data from your application.
+     *
+     * This function call results in different results based on a selected mode:
+     *
+     *  - Synchronous mode: Function always returns a pointer to a Frame object that can be filled with data. This can take some time based on GIF file size.
+     *  
+     *  - Asynchronous mode: Function can return a pointer to a Frame object or a nullptr if encoding has not yet finished on last frame.
+     *
+     * @return Frame object shared pointer/nullptr - see full description.
+     *
+     */
     inline std::shared_ptr<AppToGIF::Frame> getFrame()
     {
         auto temp = p_FrameBuffer->getFrame();
@@ -61,14 +92,28 @@ public:
         }
         return temp;
     }
-    //Get frame filled with data to frame buffer
-    //The app can no longer have access to data in order to work
+
+    /**
+     * Pass frame filled with data to frame buffer.
+     *
+     * Function passes a Frame object to encoder.
+     *
+     * Warning: Before passing frame to encoder your application has to reset the ownership of an shared pointer with Frame.
+     *
+     *@return Error Error reporter object: Check if equal to noError.
+     */
     inline AppToGIF::ErrorReporter passFrame()
     {
         return p_FrameBuffer->passFrame();
     }
-    //Commit frame from the top of the buffer
-    //Sends frame to encoder to write to file
+
+    /**
+     * Commit frame from the top of the buffer
+     *
+     * Function sends the frame from the top of the buffer for encoding in GIF file through ffmpeg interface.
+     *
+     *@return Error Error reporter object: Check if equal to noError.
+     */
     inline AppToGIF::ErrorReporter commitFrame()
     {
         return p_FrameBuffer->commitFrame();

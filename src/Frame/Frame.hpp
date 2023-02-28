@@ -26,7 +26,15 @@ public:
     int m_width, m_height;
     int m_maxWidth, m_maxHeight;
     int m_lineWidth;
-    
+    /**
+     * Returns pointer to the begining of asked row.
+     *
+     *  After specifing the row numer function returns the pointer to the first element of the row which
+     *  can be filled with data accoring to picked format used for encoding.
+     *
+     *  @param rowNum Number of row that you want to fill with data
+     *  @return rowPointer Pointer to the begining of allocated data connected to asked row
+     */
     inline uint8_t* getRow(int rowNum) {return &m_rgb[rowNum * m_lineWidth];};
 private:
     inline void setReady() { m_ReadyToEncode = true; }
