@@ -8,7 +8,7 @@ The main two features of library are:
 - Synchronous mode:  Ability to render gif files with all avaialbe frames
 ## Features that are comming soon:  
 - [X] Direct, GRBA, Double encoding modes,
-- [ ] Cmake build files,
+- [X] Cmake build files,
 - [ ] Demo apps documentation,
 - [ ] Tests.
  ## Examples
