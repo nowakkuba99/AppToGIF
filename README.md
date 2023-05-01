@@ -5,7 +5,9 @@
 C++ multithreaded library used to create GIF in real time from your application.
 The main two features of library are:
 - Asynchronous mode: Ability to create gif files in 'real time',
-- Synchronous mode:  Ability to render gif files with all avaialbe frames
+- Synchronous mode:  Ability to render gif files with all avaialbe frames.   
+
+Inspired by [DTV](https://github.com/ange-yaghi/direct-to-video).
 ## Features that are comming soon:  
 - [X] Direct, GRBA, Double encoding modes,
 - [X] Cmake build files,
